@@ -21,7 +21,7 @@ jobs:
       - run:
           command: |
             . venv/bin/activate
-            python manage.py upgrade
+            python manage.py db upgrade
       - run:
           command: |
             . venv/bin/activate
