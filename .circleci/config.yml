@@ -8,7 +8,7 @@ jobs:
           DATABASE_URL: postgresql://localhost/circle_test
       - image: circleci/postgres:9.5-alpine # database image
         environment: # environment variables for database
-          POSTGRES_USER: postgres
+          POSTGRES_USER: circleci
           POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: ""
     steps:
