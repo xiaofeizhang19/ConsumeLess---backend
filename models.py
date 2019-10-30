@@ -29,6 +29,6 @@ class Item(db.Model):
             'description': self.description,
             'category': self.category,
             'email': self.email,
-            'deposit': self.deposit,
-            'overdue_charge': self.overdue_chargeß
+            'deposit': str(self.deposit),
+            'overdue_charge': str(self.overdue_charge)
         }
