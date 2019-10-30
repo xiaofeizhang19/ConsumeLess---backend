@@ -3,10 +3,28 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.8.0
-      environment:
-        APP_SETTINGS: config.DevelopmentConfig
-      - image: circleci/postgres:9.5-alpine
+        environment:
+          APP_SETTINGS: config.DevelopmentConfig
+          DATABASE_URL: postgresql://localhost/consumeless
+      - image: circleci/postgres:9.5-alpine # database image
+        environment: # environment variables for database
+          POSTGRES_USER: 2tight2spend
+          POSTGRES_DB: consumeless
+          POSTGRES_PASSWORD: ""
     steps:
       - checkout
       - run:
-        command: python3 -m venv venv
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements/dev.txt
+      - run:
+          command: |
+            . venv/bin/activate
+            python manage.py upgrade
+      - run:
+          command: |
+            . venv/bin/activate
+            python app-test.py
+      - store_test_results:
+          path: test-reports/
