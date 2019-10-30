@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: circleci/python:3.8.0
         environment:
-          APP_SETTINGS: config.DevelopmentConfig
+          APP_SETTINGS: config.TestingConfig
           DATABASE_URL: postgresql://localhost/circle_test
       - image: circleci/postgres:9.5-alpine # database image
         environment: # environment variables for database
