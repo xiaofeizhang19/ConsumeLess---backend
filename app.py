@@ -13,5 +13,13 @@ from models import Item
 def hello():
     return "Hello World!"
 
+@app.route("/api/item/index")
+def get_all_items():
+    try :
+        items=Item.query.all()
+        return jsonify([e.serialize() for e in items])
+    except Exception as e:
+        return(str())
+        
 if __name__ == '__main__':
     app.run()
