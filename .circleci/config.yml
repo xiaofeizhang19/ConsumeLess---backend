@@ -26,5 +26,3 @@ jobs:
           command: |
             . venv/bin/activate
             python app-test.py
-      - store_test_results:
-          path: test-reports/
