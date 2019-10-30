@@ -3,13 +3,13 @@ from app import db
 class Item(db.Model):
     __tablename__ = 'items'
 
-    id = db.Column(db.Integer, primarykey=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
     description = db.Column(db.String(), nullable=False)
     category = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(), unique=True, nullable=False)
-    deposit = db.Column(db.Numeric(), precision=2, nullable=False)
-    overdue_charge = db.Column(db.Numeric(), precision=2, nullable=False)
+    deposit = db.Column(db.Numeric(precision=2), nullable=False)
+    overdue_charge = db.Column(db.Numeric(precision=2), nullable=False)
 
     def __init__(self, name, description, category, email, deposit, overdue_charge):
         self.name = name
