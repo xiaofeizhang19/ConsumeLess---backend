@@ -26,8 +26,4 @@ jobs:
       - run:
           command: |
             . venv/bin/activate
-            py.test -v tests
-      - run:
-          command: |
-            . venv/bin/activate
-            coverage report
+            pytest --cov=consumeless tests/
