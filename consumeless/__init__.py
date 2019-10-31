@@ -24,6 +24,27 @@ class CrudItem(Resource):
 def reroute_index():
     return redirect(url_for('get_all_items'))
 
+@app.route("/api/item/new", methods=["POST"])
+def add_item():
+    name=request.form.get('name')
+    description=request.form.get('description')
+    category=request.form.get('category')
+    email=request.form.get('email')
+    deposit=request.form.get('deposit')
+    overdue_charge=request.form.get('overdue_charge')
+    try:
+        item=Item(name = name,
+                description = description,
+                category = category,
+                email = email,
+                deposit = deposit,
+                overdue_charge = overdue_charge)
+        db.session.add(item)
+        db.session.commit()
+        return jsonify(item)
+    except Exception as e:
+        return(str(e))
+
 @app.route("/api/item/index")
 def get_all_items():
     try :

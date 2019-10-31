@@ -1,29 +1,23 @@
-import os
-import sys
-topdir = os.path.join(os.path.dirname(__file__), "..")
-sys.path.append(topdir)
+from tests.setup import TestSetup
+from consumeless import app, db
 
-from consumeless import app
+class RouteRoot(TestSetup):
 
-import unittest
-
-
-class BasicTestCase(unittest.TestCase):
-
-    def test_index(self):
+    def test_redirect(self):
         tester = app.test_client(self)
         response = tester.get('/', content_type='html/text')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'Hello World!')
+        self.assertEqual(response.status_code, 302)
 
-class AnotherTestCase(unittest.TestCase):
+class RouteApiItemIndex(TestSetup):
 
     def test_item_index(self):
         tester = app.test_client(self)
         response = tester.get('/api/item/index', content_type='html/text')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'[]\n')
 
+class RouteAPIIndividualItem(TestSetup):
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_item_1(self):
+        tester = app.test_client(self)
+        response = tester.get('/api/item/1', content_type='html/text')
+        self.assertEqual(response.status_code, 200)
