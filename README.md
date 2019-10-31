@@ -11,7 +11,7 @@
 - clone this repository  
 ``` $ git clone git@github.com:xiaofeizhang19/ConsumeLess-backend.git ```
 - install a virtual environment  
-``` $ pip install virtualenv ```
+``` $ pip install virtualenv ``` if this does not work try ``` pip3 install virtualenv ```
 - cd into the project directory  
 ``` $ cd ConsumeLess-backend ```
 - create a virtual environment  
@@ -20,3 +20,5 @@
 ``` $ source env/bin/activate ```
 - install the necessary python extensions using  
 ``` $ pip install -r requirements.txt ```
+- to launch the application with approriate run  
+``` $ dotenv run python manage.py runserver ```
