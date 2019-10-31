@@ -25,4 +25,4 @@ jobs:
       - run:
           command: |
             . venv/bin/activate
-            python app-test.py
+            py.test -v tests

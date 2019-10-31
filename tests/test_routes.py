@@ -1,4 +1,9 @@
-from app import app
+import os
+import sys
+topdir = os.path.join(os.path.dirname(__file__), "..")
+sys.path.append(topdir)
+
+from consumeless import app
 
 import unittest
 
@@ -18,6 +23,7 @@ class AnotherTestCase(unittest.TestCase):
         response = tester.get('/api/item/index', content_type='html/text')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, b'[]\n')
+
 
 if __name__ == '__main__':
     unittest.main()

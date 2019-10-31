@@ -1,4 +1,4 @@
-from app import db
+from consumeless import db
 
 class Item(db.Model):
     __tablename__ = 'items'
