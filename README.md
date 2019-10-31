@@ -22,3 +22,7 @@
 ``` $ pip install -r requirements.txt ```
 - to launch the application with approriate run  
 ``` $ dotenv run python manage.py runserver ```
+
+## Testing
+-to run tests with coverage output run  
+``` $ dotenv run pytest -v --cov=consumeless ```
