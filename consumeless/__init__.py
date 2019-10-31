@@ -53,7 +53,7 @@ def get_all_items():
     except Exception as e:
         return(str())
 
-api.add_resource(CrudItem, '/api/item/<id>')
+api.add_resource(CrudItem, '/api/item/<id_>')
 
 if __name__ == '__main__':
     app.run()
