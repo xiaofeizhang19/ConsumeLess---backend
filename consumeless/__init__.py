@@ -28,6 +28,7 @@ def reroute_index():
 
 @app.route("/api/item/new", methods=["POST"])
 def add_item():
+    print(request.form)
     name=request.form.get('name')
     description=request.form.get('description')
     category=request.form.get('category')
