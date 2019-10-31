@@ -2,7 +2,7 @@ from tests.setup import TestSetup
 from consumeless import app, db
 from models import Item
 
-class RouteRoot(TestSetup):
+class GetOneItem(TestSetup):
 
     def test_item_1_populated(self):
         newItem = Item(name = 'test',
@@ -17,3 +17,11 @@ class RouteRoot(TestSetup):
         response = tester.get('api/item/1', content_type='html/text')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_output)
+
+# class AddOneItem(TestSetup):
+#
+#     def test_item_added_to_database(self):
+#         tester = app.test_client(self)
+#         tester.post('api/item/1', data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com' , deposit='1.00', overdue_charge='1.00' ))
+#         item = Item.query.filter_by(id=1).first()
+#         self.assertEqual(item.name, b'new item')
