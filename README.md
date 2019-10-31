@@ -3,8 +3,8 @@
 
 ## Requirements
 > This application runs using python and postgresql as a database.  
-> In order to run on a local machine be sure to have a database named consumeless on your local machine  
-> If you would like to run tests you should also have a test database called consumeless_test
+> In order to run on a local machine be sure to have a database named **consumeless** on your local machine  
+> If you would like to run tests you should also have a test database called **consumeless_test**
 
 ## Setup
 
