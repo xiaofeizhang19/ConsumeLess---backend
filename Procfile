@@ -1,1 +1,1 @@
-web: gunicorn --chdir consumeless:app
+web: gunicorn manage:app
