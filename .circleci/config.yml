@@ -26,4 +26,4 @@ jobs:
       - run:
           command: |
             . venv/bin/activate
-            pytest --cov=consumeless tests/
+            pytest -v --cov=consumeless tests/
