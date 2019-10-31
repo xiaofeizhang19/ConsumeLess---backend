@@ -15,5 +15,9 @@ class RouteApiItemIndex(TestSetup):
         response = tester.get('/api/item/index', content_type='html/text')
         self.assertEqual(response.status_code, 200)
 
-if __name__ == '__main__':
-    unittest.main()
+class RouteAPIIndividualItem(TestSetup):
+
+    def test_item_1(self):
+        tester = app.test_client(self)
+        response = tester.get('/api/item/1', content_type='html/text')
+        self.assertEqual(response.status_code, 200)
