@@ -11,7 +11,7 @@ db = SQLAlchemy(app)
 
 from models import Item
 
-
+# using flask-restful to encompass crud for a single route
 class CrudItem(Resource):
     def get(self, id_):
         try:
