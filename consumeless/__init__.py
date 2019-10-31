@@ -45,7 +45,7 @@ def add_item():
                 overdue_charge = overdue_charge)
         db.session.add(item)
         db.session.commit()
-        return jsonify(item)
+        return request.form
     except Exception as e:
         return(str(e))
 
