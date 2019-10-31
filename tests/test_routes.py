@@ -10,6 +10,7 @@ import unittest
 class BasicTestCase(unittest.TestCase):
 
     def setUp(self):
+        db.drop_all()
         db.create_all()
 
     def test_index(self):
@@ -18,6 +19,10 @@ class BasicTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
 
 class AnotherTestCase(unittest.TestCase):
+
+    def setUp(self):
+        db.drop_all()
+        db.create_all()
 
     def test_item_index(self):
         tester = app.test_client(self)
