@@ -53,3 +53,14 @@ class GetOneUSer(TestSetup):
         response = tester.get('api/user/1', content_type='html/text')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_output)
+
+class AddOneUSer(TestSetup):
+
+    def test_user_added_to_database(self):
+        tester = app.test_client(self)
+        response = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b'successfully added user: new user')

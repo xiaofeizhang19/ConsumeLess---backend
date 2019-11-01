@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
 from flask_cors import CORS
+from werkzeug.security import check_password_hash, generate_password_hash
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
@@ -66,6 +67,24 @@ def get_all_items():
         return jsonify([e.serialize() for e in items])
     except Exception as e:
         return(str())
+
+@app.route("/api/user/new", methods=["POST"])
+def add_user():
+    print(request.form)
+    username=request.form.get('username')
+    email=request.form.get('email')
+    password_hash=generate_password_hash(request.form.get('password'))
+    created_at=date.today().strftime("%d/%m/%Y")
+    try:
+        user=User(username = username,
+                email = email,
+                password_hash = password_hash,
+                created_at = created_at,)
+        db.session.add(user)
+        db.session.commit()
+        return f"successfully added user: {user.username}"
+    except Exception as e:
+        return(str(e))
 
 api.add_resource(ApiItem, '/api/item/<i_id>')
 api.add_resource(ApiUser, '/api/user/<u_id>')
