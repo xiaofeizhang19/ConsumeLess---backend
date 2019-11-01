@@ -7,17 +7,20 @@ class Item(db.Model):
     name = db.Column(db.String(), nullable=False)
     description = db.Column(db.String(), nullable=False)
     category = db.Column(db.String(), nullable=False)
-    email = db.Column(db.String(), unique=True, nullable=False)
-    deposit = db.Column(db.Numeric(precision=2), nullable=False)
-    overdue_charge = db.Column(db.Numeric(precision=2), nullable=False)
+    email = db.Column(db.String(), nullable=False)
+    deposit = db.Column(db.Numeric(), nullable=False)
+    overdue_charge = db.Column(db.Numeric(), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+    available = db.Column(db.Boolean, default=True)
 
-    def __init__(self, name, description, category, email, deposit, overdue_charge):
+    def __init__(self, name, description, category, email, deposit, overdue_charge, created_at):
         self.name = name
         self.description = description
         self.category = category
         self.email = email
         self.deposit = deposit
         self.overdue_charge = overdue_charge
+        self.created_at = created_at
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -30,5 +33,6 @@ class Item(db.Model):
             'category': self.category,
             'email': self.email,
             'deposit': str(self.deposit),
-            'overdue_charge': str(self.overdue_charge)
+            'overdue_charge': str(self.overdue_charge),
+            'created_at': self.created_at.strftime("%d/%m/%Y")
         }
