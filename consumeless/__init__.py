@@ -1,6 +1,6 @@
 import os
 from datetime import date
-from flask import Flask, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
 from flask_cors import CORS
@@ -35,6 +35,22 @@ class ApiUser(Resource):
 @app.route("/")
 def reroute_index():
     return redirect(url_for('get_all_items'))
+
+@app.route("/login", methods=["POST"])
+def login_user():
+    print(request.form)
+    username=request.form.get('username')
+    password=request.form.get('password')
+    try:
+        user=User.query.filter_by(username=username).first()
+        if check_password_hash(user.password_hash, password):
+            session.clear()
+            session['user_id'] = user.id
+            return "Well Done"
+        else:
+            return "invalid password"
+    except Exception as e:
+        return(str(e))
 
 @app.route("/api/item/new", methods=["POST"])
 def add_item():
