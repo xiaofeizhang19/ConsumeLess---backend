@@ -32,3 +32,18 @@ class UnsuccessfulLogin(TestSetup):
              )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, b'invalid password')
+
+class MoreUnsuccessfulLogin(TestSetup):
+
+    def test_login(self):
+        tester = app.test_client(self)
+        tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        response = tester.post(
+            'login',
+             data=dict(username='new user')
+             )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b"a bytes-like object is required, not 'NoneType'")
