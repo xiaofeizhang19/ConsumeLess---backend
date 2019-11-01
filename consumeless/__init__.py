@@ -12,14 +12,22 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Item
+from models import Item, User
 
 # using flask-restful to encompass crud for a single route
-class CrudItem(Resource):
-    def get(self, id_):
+class ApiItem(Resource):
+    def get(self, i_id):
         try:
-            item=Item.query.filter_by(id=id_).first()
+            item=Item.query.filter_by(id=i_id).first()
             return jsonify(item.serialize())
+        except Exception as e:
+            return(str(e))
+
+class ApiUser(Resource):
+    def get(self, u_id):
+        try:
+            user=User.query.filter_by(id=u_id).first()
+            return jsonify(user.serialize())
         except Exception as e:
             return(str(e))
 
@@ -59,7 +67,8 @@ def get_all_items():
     except Exception as e:
         return(str())
 
-api.add_resource(CrudItem, '/api/item/<id_>')
+api.add_resource(ApiItem, '/api/item/<i_id>')
+api.add_resource(ApiUser, '/api/user/<u_id>')
 
 if __name__ == '__main__':
     app.run()
