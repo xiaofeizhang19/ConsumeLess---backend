@@ -23,12 +23,8 @@
 - apply the db migrations
 ``` $ dotenv run python.py db upgrade ```
 - to launch the application with approriate run  
-<<<<<<< HEAD
 ``` $ dotenv run python manage.py runserver ```
 
 ## Testing
 -to run tests with coverage output run  
 ``` $ dotenv run pytest -v --cov=consumeless ```
-=======
-``` $ dotenv run python manage.py runserver ```
->>>>>>> 4be3145d54f1434646ce06bc2bc9941d5cbae082
