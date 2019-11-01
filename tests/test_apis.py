@@ -40,6 +40,16 @@ class AddOneItem(TestSetup):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, b'successfully added item: new item')
 
+class BadAddOneItem(TestSetup):
+
+    def test_item_add_error(self):
+        tester = app.test_client(self)
+        self.assertRaises(Exception, tester.post(
+            'api/item/new',
+             data=dict(name='new item', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
+             ))
+
+
 class GetOneUSer(TestSetup):
 
     def test_user_1_populated(self):
@@ -64,3 +74,12 @@ class AddOneUSer(TestSetup):
              )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, b'successfully added user: new user')
+
+class BadAddOneUser(TestSetup):
+
+    def test_user_add_error(self):
+        tester = app.test_client(self)
+        self.assertRaises(Exception, tester.post(
+            'api/user/new',
+             data=dict(username='new user', password="test")
+             ))
