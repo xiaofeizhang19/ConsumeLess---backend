@@ -42,13 +42,11 @@ def login_user():
     username=request.form.get('username')
     password=request.form.get('password')
     try:
-        print("this is running")
         user=User.query.filter_by(username=username).first()
-        print(user)
-        if check_password_hash(user.password, password):
+        if check_password_hash(user.password_hash, password):
             session.clear()
             session['user_id'] = user.id
-            return "well done"
+            return "Well Done"
         else:
             return "invalid password"
     except Exception as e:
