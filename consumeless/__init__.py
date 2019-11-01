@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from flask import Flask, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
@@ -35,13 +36,15 @@ def add_item():
     email=request.form.get('email')
     deposit=request.form.get('deposit')
     overdue_charge=request.form.get('overdue_charge')
+    created_at=date.today().strftime("%d/%m/%Y")
     try:
         item=Item(name = name,
                 description = description,
                 category = category,
                 email = email,
                 deposit = deposit,
-                overdue_charge = overdue_charge)
+                overdue_charge = overdue_charge,
+                created_at = created_at,)
         db.session.add(item)
         db.session.commit()
         return request.form
