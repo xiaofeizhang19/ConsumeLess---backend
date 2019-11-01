@@ -20,5 +20,7 @@
 ``` $ source env/bin/activate ```
 - install the necessary python extensions using  
 ``` $ pip install -r requirements.txt ```
+- apply the db migrations
+``` $ dotenv run python.py db upgrade ```
 - to launch the application with approriate run  
 ``` $ dotenv run python manage.py runserver ```
