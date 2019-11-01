@@ -20,6 +20,14 @@ class GetOneItem(TestSetup):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_output)
 
+class GetItemException(TestSetup):
+
+    def test_item_not_populated(self):
+        tester = app.test_client(self)
+        response = tester.get('api/item/4', content_type='html/text')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, b'"\'NoneType\' object has no attribute \'serialize\'"\n')
+
 class AddOneItem(TestSetup):
 
     def test_item_added_to_database(self):
