@@ -47,7 +47,7 @@ def add_item():
                 created_at = created_at,)
         db.session.add(item)
         db.session.commit()
-        return request.form
+        return f"successfully added item: {item.name}"
     except Exception as e:
         return(str(e))
 
