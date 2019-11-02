@@ -37,11 +37,16 @@ class AddOneItem(TestSetup):
 
     def test_item_added_to_database(self):
         tester = app.test_client(self)
+        login = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        token = json.loads(login.data)['token']
+        print(token)
         response = tester.post(
-            'api/item/new',
+            f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
              )
-        print(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             json.loads(response.data),
@@ -82,9 +87,7 @@ class AddOneUSer(TestSetup):
              data=dict(username='new user', email='e@yahoo.com', password='test')
              )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.data),
-            {'message': 'successfully added user: new user'},
+        self.assertIn( 'successfully added user: new user', json.loads(response.data)['message']
         )
 
 class BadAddOneUser(TestSetup):

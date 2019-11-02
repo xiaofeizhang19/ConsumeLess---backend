@@ -1,5 +1,6 @@
 import os
-from datetime import date
+from datetime import date, datetime
+import jwt
 from flask import (
     abort,
     Flask,
@@ -16,6 +17,7 @@ from flask_cors import CORS
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
+from functools import wraps
 
 app = Flask(__name__)
 CORS(app)
@@ -26,6 +28,21 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 from models import Item, User
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.args.get('token')
+        print(token)
+        if not token:
+            return error(403, "Token is missing!")
+        try:
+            data = jwt.decode(token, app.config.get('SECRET_KEY'))
+        except:
+            return error(407, "Token is invalid!")
+
+        return f(*args, **kwargs)
+    return decorated
 
 def error(
     status=500,
@@ -50,7 +67,6 @@ def handle_exception(e):
     return error()
 
 app.handle_exception = handle_exception
-
 
 # using flask-restful to encompass crud for a single route
 class ApiItem(Resource):
@@ -94,6 +110,7 @@ def login_user():
     abort(error(400, "Invalid password"))
 
 @app.route("/api/item/new", methods=["POST"])
+@token_required
 def add_item():
     print(request.form)
     name=request.form.get('name')
@@ -134,9 +151,8 @@ def add_user():
                 created_at = created_at,)
         db.session.add(user)
         db.session.commit()
-        return jsonify(
-            message=f"successfully added user: {user.username}"
-        )
+        token = (repr(user.encode_auth_token(user.id))[2:-1])
+        return jsonify({'message': f"successfully added user: {user.username}", 'token' : str(token)})
     except IntegrityError as e:
         if isinstance(e.orig, UniqueViolation):
             abort(error(409, "User exists"))

@@ -1,4 +1,6 @@
-from consumeless import db
+from consumeless import app, db
+import datetime
+import jwt
 
 class Item(db.Model):
     __tablename__ = 'items'
@@ -62,3 +64,22 @@ class User(db.Model):
             'email': self.email,
             'created_at': self.created_at.strftime("%d/%m/%Y")
         }
+
+    def encode_auth_token(self, user_id):
+        """
+        Generates the Auth Token
+        :return: string
+        """
+        try:
+            payload = {
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=30),
+                'iat': datetime.datetime.utcnow(),
+                'sub': user_id
+            }
+            return jwt.encode(
+                payload,
+                app.config.get('SECRET_KEY'),
+                algorithm='HS256'
+            )
+        except Exception as e:
+            return e
