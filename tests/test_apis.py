@@ -2,6 +2,7 @@ from datetime import datetime
 from tests.setup import TestSetup
 from consumeless import app, db
 from models import Item, User
+import json
 
 class GetOneItem(TestSetup):
 
@@ -15,6 +16,7 @@ class GetOneItem(TestSetup):
                     created_at = datetime(2019, 11, 1))
         expected_output = b'{"category":"test","created_at":"01/11/2019","deposit":"1.0","description":"testing","email":"test@gmail.com","id":1,"name":"test","overdue_charge":"1.0"}\n'
         db.session.add(newItem)
+        db.session.commit()
         tester = app.test_client(self)
         response = tester.get('api/item/1', content_type='html/text')
         self.assertEqual(response.status_code, 200)
@@ -25,8 +27,11 @@ class GetItemException(TestSetup):
     def test_item_not_populated(self):
         tester = app.test_client(self)
         response = tester.get('api/item/4', content_type='html/text')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'"\'NoneType\' object has no attribute \'serialize\'"\n')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            json.loads(response.data),
+            {"error": "Item not found"},
+        )
 
 class AddOneItem(TestSetup):
 
@@ -38,7 +43,10 @@ class AddOneItem(TestSetup):
              )
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'successfully added item: new item')
+        self.assertEqual(
+            json.loads(response.data),
+            {'message': 'successfully added item: new item'},
+        )
 
 class BadAddOneItem(TestSetup):
 
@@ -59,6 +67,7 @@ class GetOneUSer(TestSetup):
                     created_at = datetime(2019, 11, 1))
         expected_output = b'{"created_at":"01/11/2019","email":"testuser@gmail.com","id":1,"username":"testuser"}\n'
         db.session.add(newUser)
+        db.session.commit()
         tester = app.test_client(self)
         response = tester.get('api/user/1', content_type='html/text')
         self.assertEqual(response.status_code, 200)
@@ -73,7 +82,10 @@ class AddOneUSer(TestSetup):
              data=dict(username='new user', email='e@yahoo.com', password='test')
              )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'successfully added user: new user')
+        self.assertEqual(
+            json.loads(response.data),
+            {'message': 'successfully added user: new user'},
+        )
 
 class BadAddOneUser(TestSetup):
 

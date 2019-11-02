@@ -20,11 +20,11 @@ class RouteAPIItemID(TestSetup):
     def test_item_1(self):
         tester = app.test_client(self)
         response = tester.get('/api/item/1', content_type='html/text')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
 
 class RouteAPIUserID(TestSetup):
 
     def test_user_1(self):
         tester = app.test_client(self)
         response = tester.get('/api/user/1', content_type='html/text')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
