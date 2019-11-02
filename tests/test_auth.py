@@ -17,7 +17,10 @@ class SuccessfulLogin(TestSetup):
              data=dict(username='new user', password='test')
              )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'Well Done')
+        self.assertEqual(
+            json.loads(response.data),
+            {'message': 'Well done'},
+        )
 
 class UnsuccessfulLogin(TestSetup):
 

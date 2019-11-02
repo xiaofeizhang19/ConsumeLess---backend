@@ -43,7 +43,10 @@ class AddOneItem(TestSetup):
              )
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'successfully added item: new item')
+        self.assertEqual(
+            json.loads(response.data),
+            {'message': 'successfully added item: new item'},
+        )
 
 class BadAddOneItem(TestSetup):
 
@@ -79,7 +82,10 @@ class AddOneUSer(TestSetup):
              data=dict(username='new user', email='e@yahoo.com', password='test')
              )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'successfully added user: new user')
+        self.assertEqual(
+            json.loads(response.data),
+            {'message': 'successfully added user: new user'},
+        )
 
 class BadAddOneUser(TestSetup):
 

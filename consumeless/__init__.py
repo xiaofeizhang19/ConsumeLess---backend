@@ -89,7 +89,7 @@ def login_user():
     if check_password_hash(user.password_hash, password):
         session.clear()
         session['user_id'] = user.id
-        return "Well Done"
+        return jsonify(message="Well done")
 
     abort(error(400, "Invalid password"))
 
@@ -112,7 +112,9 @@ def add_item():
             created_at = created_at,)
     db.session.add(item)
     db.session.commit()
-    return f"successfully added item: {item.name}"
+    return jsonify(
+        message=f"successfully added item: {item.name}"
+    )
 
 @app.route("/api/item/index")
 def get_all_items():
@@ -132,7 +134,9 @@ def add_user():
                 created_at = created_at,)
         db.session.add(user)
         db.session.commit()
-        return f"successfully added user: {user.username}"
+        return jsonify(
+            message=f"successfully added user: {user.username}"
+        )
     except IntegrityError as e:
         if isinstance(e.orig, UniqueViolation):
             abort(error(409, "User exists"))
