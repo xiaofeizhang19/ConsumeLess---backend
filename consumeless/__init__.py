@@ -55,12 +55,18 @@ app.handle_exception = handle_exception
 # using flask-restful to encompass crud for a single route
 class ApiItem(Resource):
     def get(self, i_id):
-        item=Item.query.filter_by(id=i_id).first()
+        item = Item.query.filter_by(id=i_id).first()
+        if item is None:
+            return error(404, "Item not found")
+
         return jsonify(item.serialize())
 
 class ApiUser(Resource):
     def get(self, u_id):
-        user=User.query.filter_by(id=u_id).first()
+        user = User.query.filter_by(id=u_id).first()
+        if user is None:
+            return error(404, "User not found")
+
         return jsonify(user.serialize())
 
 @app.route("/")
@@ -72,6 +78,10 @@ def login_user():
     print(request.form)
     username=request.form.get('username')
     password=request.form.get('password')
+
+    if not username or not password:
+        abort(error(400, "Insufficient information"))
+
     user=User.query.filter_by(username=username).first()
 
     if check_password_hash(user.password_hash, password):

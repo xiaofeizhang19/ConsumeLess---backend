@@ -2,6 +2,7 @@ from datetime import datetime
 from tests.setup import TestSetup
 from consumeless import app, db
 from models import User
+import json
 
 class SuccessfulLogin(TestSetup):
 
@@ -30,8 +31,11 @@ class UnsuccessfulLogin(TestSetup):
             'login',
              data=dict(username='new user', password='testing')
              )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b'invalid password')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.data),
+            {"error": "Invalid password"},
+        )
 
 class MoreUnsuccessfulLogin(TestSetup):
 
@@ -45,5 +49,8 @@ class MoreUnsuccessfulLogin(TestSetup):
             'login',
              data=dict(username='new user')
              )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, b"a bytes-like object is required, not 'NoneType'")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.data),
+            {"error": "Insufficient information"},
+        )
