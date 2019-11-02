@@ -109,7 +109,6 @@ def get_all_items():
 
 @app.route("/api/user/new", methods=["POST"])
 def add_user():
-    print(request.form)
     username=request.form.get('username')
     email=request.form.get('email')
     password_hash=generate_password_hash(request.form.get('password'))
