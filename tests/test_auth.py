@@ -54,3 +54,17 @@ class MoreUnsuccessfulLogin(TestSetup):
             json.loads(response.data),
             {"error": "Insufficient information"},
         )
+
+class UnsuccessfulLoginWhenUserDoesNotExist(TestSetup):
+
+    def test_login(self):
+        tester = app.test_client(self)
+        response = tester.post(
+            'login',
+            data=dict(username='user', password="pass")
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.data),
+            {"error": "User does not exist"},
+        )

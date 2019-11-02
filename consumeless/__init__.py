@@ -82,7 +82,9 @@ def login_user():
     if not username or not password:
         abort(error(400, "Insufficient information"))
 
-    user=User.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(error(400, "User does not exist"))
 
     if check_password_hash(user.password_hash, password):
         session.clear()
