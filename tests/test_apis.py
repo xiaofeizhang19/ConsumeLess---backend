@@ -44,7 +44,7 @@ class AddOneItem(TestSetup):
         token = json.loads(login.data)['token']
         print(token)
         response = tester.post(
-            f'api/item/new?token={str(token)}',
+            f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
              )
         self.assertEqual(response.status_code, 200)
