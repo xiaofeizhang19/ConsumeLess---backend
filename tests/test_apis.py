@@ -15,6 +15,7 @@ class GetOneItem(TestSetup):
                     created_at = datetime(2019, 11, 1))
         expected_output = b'{"category":"test","created_at":"01/11/2019","deposit":"1.0","description":"testing","email":"test@gmail.com","id":1,"name":"test","overdue_charge":"1.0"}\n'
         db.session.add(newItem)
+        db.session.commit()
         tester = app.test_client(self)
         response = tester.get('api/item/1', content_type='html/text')
         self.assertEqual(response.status_code, 200)
@@ -59,6 +60,7 @@ class GetOneUSer(TestSetup):
                     created_at = datetime(2019, 11, 1))
         expected_output = b'{"created_at":"01/11/2019","email":"testuser@gmail.com","id":1,"username":"testuser"}\n'
         db.session.add(newUser)
+        db.session.commit()
         tester = app.test_client(self)
         response = tester.get('api/user/1', content_type='html/text')
         self.assertEqual(response.status_code, 200)
