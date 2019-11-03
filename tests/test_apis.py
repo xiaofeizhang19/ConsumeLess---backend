@@ -42,7 +42,6 @@ class AddOneItem(TestSetup):
              data=dict(username='new user', email='e@yahoo.com', password='test')
              )
         token = json.loads(login.data)['token']
-        print(token)
         response = tester.post(
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
