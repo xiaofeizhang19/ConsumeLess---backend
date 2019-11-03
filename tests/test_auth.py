@@ -91,3 +91,18 @@ class Register(TestSetup):
              )
         token = json.loads(register.data)['token']
         self.assertTrue(jwt.decode(token, app.config.get('SECRET_KEY')))
+
+class AddNewItem(TestSetup):
+
+    def test_token_required(self):
+        tester = app.test_client(self)
+        register = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        response = tester.post(
+            'api/item/new',
+             data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
+             )
+        forbidden_error_code = 403
+        self.assertEqual(response.status_code, forbidden_error_code)
