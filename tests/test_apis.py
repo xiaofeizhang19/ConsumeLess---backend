@@ -4,9 +4,9 @@ from consumeless import app, db
 from models import Item, User
 import json
 
-class GetOneItem(TestSetup):
+class ItemAPIs(TestSetup):
 
-    def test_item_1_populated(self):
+    def test_1_populated(self):
         newItem = Item(name = 'test',
                     description = "testing",
                     category = 'test',
@@ -22,9 +22,7 @@ class GetOneItem(TestSetup):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_output)
 
-class GetItemException(TestSetup):
-
-    def test_item_not_populated(self):
+    def test_item_not_found(self):
         tester = app.test_client(self)
         response = tester.get('api/item/4', content_type='html/text')
         self.assertEqual(response.status_code, 404)
@@ -32,8 +30,6 @@ class GetItemException(TestSetup):
             json.loads(response.data),
             {"error": "Item not found"},
         )
-
-class AddOneItem(TestSetup):
 
     def test_item_added_to_database(self):
         tester = app.test_client(self)
@@ -52,9 +48,7 @@ class AddOneItem(TestSetup):
             {'message': 'successfully added item: new item'},
         )
 
-class BadAddOneItem(TestSetup):
-
-    def test_item_add_error(self):
+    def test_missing_params_raises_error(self):
         tester = app.test_client(self)
         self.assertRaises(Exception, tester.post(
             'api/item/new',
@@ -62,7 +56,7 @@ class BadAddOneItem(TestSetup):
              ))
 
 
-class GetOneUSer(TestSetup):
+class UserAPIs(TestSetup):
 
     def test_user_1_populated(self):
         newUser = User(username = 'testuser',
@@ -77,8 +71,6 @@ class GetOneUSer(TestSetup):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_output)
 
-class AddOneUSer(TestSetup):
-
     def test_user_added_to_database(self):
         tester = app.test_client(self)
         response = tester.post(
@@ -89,9 +81,7 @@ class AddOneUSer(TestSetup):
         self.assertIn( 'successfully added user: new user', json.loads(response.data)['message']
         )
 
-class BadAddOneUser(TestSetup):
-
-    def test_user_add_error(self):
+    def test_missing_email_raises_error(self):
         tester = app.test_client(self)
         self.assertRaises(Exception, tester.post(
             'api/user/new',
