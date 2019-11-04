@@ -36,7 +36,7 @@ def token_required(f):
         if not token:
             return error(403, "Token is missing!")
         try:
-            token_data = jwt.decode(token, app.config.get('SECRET_KEY'))
+            token_data = jwt.decode(token, app.config.get('SECRET_KEY'), algorithms='HS256')
         except:
             return error(407, "Token is invalid!")
 
@@ -67,7 +67,11 @@ def handle_exception(e):
 
 app.handle_exception = handle_exception
 
-# using flask-restful to encompass crud for a single route
+@app.route("/api/item/index")
+def get_all_items():
+    items=Item.query.all()
+    return jsonify([e.serialize() for e in items])
+
 class ApiItem(Resource):
     def get(self, i_id):
         item = Item.query.filter_by(id=i_id).first()
@@ -75,6 +79,28 @@ class ApiItem(Resource):
             return error(404, "Item not found")
 
         return jsonify(item.serialize())
+
+    @token_required
+    def post(token_data, self, i_id):
+        name=request.form.get('name')
+        description=request.form.get('description')
+        category=request.form.get('category')
+        owner_id=token_data['user_id']
+        deposit=request.form.get('deposit')
+        overdue_charge=request.form.get('overdue_charge')
+        created_at=date.today().strftime("%d/%m/%Y")
+        item=Item(name = name,
+                description = description,
+                category = category,
+                owner_id = owner_id,
+                deposit = deposit,
+                overdue_charge = overdue_charge,
+                created_at = created_at,)
+        db.session.add(item)
+        db.session.commit()
+        return jsonify(
+            message=f"successfully added item: {item.name}"
+        )
 
 class ApiUser(Resource):
     def get(self, u_id):
@@ -84,7 +110,38 @@ class ApiUser(Resource):
 
         return jsonify(user.serialize())
 
+    def post(self, u_id):
+        username=request.form.get('username')
+        email=request.form.get('email')
+        password_hash=generate_password_hash(request.form.get('password'))
+        created_at=date.today().strftime("%d/%m/%Y")
+        try:
+            user=User(username = username,
+                    email = email,
+                    password_hash = password_hash,
+                    created_at = created_at,)
+            db.session.add(user)
+            db.session.commit()
+            token = (repr(user.encode_auth_token(user.id))[2:-1])
+            return jsonify({'message': f"successfully added user: {user.username}", 'token' : str(token)})
+        except IntegrityError as e:
+            if isinstance(e.orig, UniqueViolation):
+                abort(error(409, "User exists"))
+            else:
+                raise
+
 class ApiBooking(Resource):
+    @token_required
+    def get(token_data, self, b_id):
+        if b_id == 'requests':
+            confirmed = False
+        else:
+            confirmed = True
+        owner_id = token_data['user_id']
+        bookings = Booking.query.filter_by(owner_id=owner_id, confirmed=confirmed).all()
+        return jsonify([e.serialize() for e in bookings])
+
+
     @token_required
     def post(token_data, self, b_id):
         item_id=request.form.get('item_id')
@@ -100,6 +157,20 @@ class ApiBooking(Resource):
         db.session.add(booking)
         db.session.commit()
         return jsonify(f'{booking.return_by}')
+
+    @token_required
+    def patch(token_data, self, b_id):
+        booking = Booking.query.filter_by(id=b_id).first()
+        booking.confirmed = True
+        db.session.commit()
+        return jsonify(f'Booking {booking.id} confirmed successfully')
+
+    @token_required
+    def delete(token_data, self, b_id):
+        booking = Booking.query.filter_by(id=b_id).first()
+        db.session.delete(booking)
+        db.session.commit()
+        return jsonify(f'Booking deleted')
 
 @app.route("/")
 def reroute_index():
@@ -125,59 +196,10 @@ def login_user():
 
     abort(error(400, "Invalid password"))
 
-@app.route("/api/item/new", methods=["POST"])
-@token_required
-def add_item(token_data):
-    name=request.form.get('name')
-    description=request.form.get('description')
-    category=request.form.get('category')
-    owner_id=token_data['user_id']
-    deposit=request.form.get('deposit')
-    overdue_charge=request.form.get('overdue_charge')
-    created_at=date.today().strftime("%d/%m/%Y")
-    item=Item(name = name,
-            description = description,
-            category = category,
-            owner_id = owner_id,
-            deposit = deposit,
-            overdue_charge = overdue_charge,
-            created_at = created_at,)
-    db.session.add(item)
-    db.session.commit()
-    return jsonify(
-        message=f"successfully added item: {item.name}"
-    )
-
-@app.route("/api/item/index")
-def get_all_items():
-    items=Item.query.all()
-    return jsonify([e.serialize() for e in items])
-
 @app.route("/api/categories/<cat>")
 def get_items_by_category(cat):
     items = Item.query.filter_by(category=cat).all()
     return jsonify([e.serialize() for e in items])
-
-@app.route("/api/user/new", methods=["POST"])
-def add_user():
-    username=request.form.get('username')
-    email=request.form.get('email')
-    password_hash=generate_password_hash(request.form.get('password'))
-    created_at=date.today().strftime("%d/%m/%Y")
-    try:
-        user=User(username = username,
-                email = email,
-                password_hash = password_hash,
-                created_at = created_at,)
-        db.session.add(user)
-        db.session.commit()
-        token = (repr(user.encode_auth_token(user.id))[2:-1])
-        return jsonify({'message': f"successfully added user: {user.username}", 'token' : str(token)})
-    except IntegrityError as e:
-        if isinstance(e.orig, UniqueViolation):
-            abort(error(409, "User exists"))
-        else:
-            raise
 
 api.add_resource(ApiItem, '/api/item/<i_id>')
 api.add_resource(ApiUser, '/api/user/<u_id>')

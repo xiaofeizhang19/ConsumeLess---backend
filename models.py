@@ -72,7 +72,7 @@ class User(db.Model):
         :return: string
         """
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=30),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=3600),
             'iat': datetime.datetime.utcnow(),
             'user_id': user_id
         }
@@ -108,7 +108,7 @@ class Booking(db.Model):
             'item_id': self.item_id,
             'owner_id': self.owner_id,
             'created_by': self.created_by,
-            'created_at': self.created_at,
-            'return_by': self.return_by,
+            'created_at': self.created_at.strftime("%d/%m/%Y"),
+            'return_by': self.return_by.strftime("%d/%m/%Y"),
             'confirmed': self.confirmed,
         }

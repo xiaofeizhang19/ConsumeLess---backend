@@ -79,7 +79,7 @@ class Login(TestSetup):
              data=dict(username='new user', password='test')
              )
         token = json.loads(login.data)['token']
-        self.assertTrue(jwt.decode(token, app.config.get('SECRET_KEY')))
+        self.assertTrue(jwt.decode(token, app.config.get('SECRET_KEY'), algorithms='HS256'))
 
 class Register(TestSetup):
 
@@ -90,7 +90,7 @@ class Register(TestSetup):
              data=dict(username='new user', email='e@yahoo.com', password='test')
              )
         token = json.loads(register.data)['token']
-        self.assertTrue(jwt.decode(token, app.config.get('SECRET_KEY')))
+        self.assertTrue(jwt.decode(token, app.config.get('SECRET_KEY'), algorithms='HS256'))
 
     def test_error_if_user_already_exists(self):
         tester = app.test_client(self)
