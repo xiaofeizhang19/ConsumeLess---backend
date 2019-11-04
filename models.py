@@ -72,7 +72,7 @@ class User(db.Model):
         :return: string
         """
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=30),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=3600),
             'iat': datetime.datetime.utcnow(),
             'user_id': user_id
         }

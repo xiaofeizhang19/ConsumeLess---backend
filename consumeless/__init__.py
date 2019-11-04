@@ -162,7 +162,7 @@ class ApiBooking(Resource):
     def patch(token_data, self, b_id):
         booking = Booking.query.filter_by(id=b_id).first()
         booking.confirmed = True
-        db.session.commit
+        db.session.commit()
         return jsonify(f'Booking {booking.id} confirmed successfully')
 
 @app.route("/")
