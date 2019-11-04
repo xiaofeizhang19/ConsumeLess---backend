@@ -162,5 +162,5 @@ def add_user():
 api.add_resource(ApiItem, '/api/item/<i_id>')
 api.add_resource(ApiUser, '/api/user/<u_id>')
 
-if __name__ == '__main__':
-    app.run()
+# if __name__ == '__main__':
+#     app.run()
