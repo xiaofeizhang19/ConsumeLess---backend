@@ -154,7 +154,7 @@ class BookingsAPI(TestSetup):
         )
         self.assertIn(bytes_return_date, response.data)
 
-    def test_confirm_booking(self):
+    def test_get_bookings_confirmed(self):
         tester = app.test_client()
         register = tester.post(
             'api/user/new',
@@ -170,8 +170,14 @@ class BookingsAPI(TestSetup):
             f'api/booking/new?token={token}',
              data=dict(item_id=1, return_by=return_date)
              )
-        response=tester.patch(
+        return_date = (date.today() + timedelta(days = 5)).strftime("%d/%m/%Y")
+        bytes_return_date = (str(return_date).encode())
+        tester.patch(
             f'api/booking/1?token={token}',
             data=dict(confirmed=True)
         )
-        self.assertEqual(response.data, b'"Booking 1 confirmed successfully"\n')
+        response = tester.get(
+            f'api/booking/confirmed?token={token}',
+            content_type='html/text'
+        )
+        self.assertIn(bytes_return_date, response.data)
