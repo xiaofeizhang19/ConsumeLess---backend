@@ -138,6 +138,11 @@ def get_all_items():
     items=Item.query.all()
     return jsonify([e.serialize() for e in items])
 
+@app.route("/api/categories/<cat>")
+def get_items_by_category(cat):
+    items = Item.query.filter_by(category=cat).all()
+    return jsonify([e.serialize() for e in items])
+
 @app.route("/api/user/new", methods=["POST"])
 def add_user():
     username=request.form.get('username')

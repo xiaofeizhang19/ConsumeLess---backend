@@ -98,3 +98,21 @@ class BadAddOneUser(TestSetup):
             'api/user/new',
              data=dict(username='new user', password="test")
              ))
+
+class getCategories(TestSetup):
+
+    def test_getting_items_by_category(self):
+        tester = app.test_client(self)
+        login = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        token = json.loads(login.data)['token']
+        print(token)
+        response1 = tester.post(
+            f'api/item/new?token={token}',
+             data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
+             )
+        self.assertEqual(response1.status_code, 200)
+        response2 = tester.get("/api/categories/cat", content_type="html/text")
+        self.assertIn(b'new item', response2.data)
