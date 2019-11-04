@@ -212,3 +212,33 @@ class BookingsAPI(TestSetup):
             content_type='html/text'
         )
         self.assertEqual(response.data, b'[]\n')
+
+    def test_get_my_bookings(self):
+        tester = app.test_client()
+        # register a user and get token
+        register = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        token = json.loads(register.data)['token']
+        # add an item to db
+        tester.post(
+            f'api/item/new?token={token}',
+             data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
+             )
+        return_date = (date.today() + timedelta(days = 5))
+        # request a booking
+        tester.post(
+            f'api/booking/new?token={token}',
+             data=dict(item_id=1, return_by=return_date)
+             )
+        # confirm booking
+        tester.patch(
+            f'api/booking/1?token={token}',
+            data=dict(confirmed=True)
+        )
+        response = tester.get(
+            f'api/bookings?token={token}',
+            content_type='html/text'
+        )
+        self.assertIn(b'"confirmed":true',response.data )
