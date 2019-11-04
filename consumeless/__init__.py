@@ -91,7 +91,6 @@ def reroute_index():
 
 @app.route("/login", methods=["POST"])
 def login_user():
-    print(request.form)
     username=request.form.get('username')
     password=request.form.get('password')
 
@@ -105,14 +104,15 @@ def login_user():
     if check_password_hash(user.password_hash, password):
         session.clear()
         session['user_id'] = user.id
-        return jsonify(message="Well done")
+        token = (repr(user.encode_auth_token(user.id))[2:-1])
+        return jsonify({'message': f"successfully logged in user: {user.username}", 'token' : str(token)})
 
     abort(error(400, "Invalid password"))
 
 @app.route("/api/item/new", methods=["POST"])
 @token_required
 def add_item():
-    print(request.form)
+    # print(request.form)
     name=request.form.get('name')
     description=request.form.get('description')
     category=request.form.get('category')
