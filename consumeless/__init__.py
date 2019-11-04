@@ -132,6 +132,17 @@ class ApiUser(Resource):
 
 class ApiBooking(Resource):
     @token_required
+    def get(token_data, self, b_id):
+        if b_id == 'requests':
+            confirmed = False
+        else:
+            confirmed = True
+        owner_id = token_data['user_id']
+        bookings = Booking.query.filter_by(owner_id=owner_id, confirmed=confirmed).all()
+        return jsonify([e.serialize() for e in bookings])
+
+
+    @token_required
     def post(token_data, self, b_id):
         item_id=request.form.get('item_id')
         owner_id=Item.query.with_entities(Item.owner_id).filter_by(id=item_id).first()[0]
