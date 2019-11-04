@@ -33,15 +33,14 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.args.get('token')
-        print(token)
         if not token:
             return error(403, "Token is missing!")
         try:
-            data = jwt.decode(token, app.config.get('SECRET_KEY'))
+            token_data = jwt.decode(token, app.config.get('SECRET_KEY'))
         except:
             return error(407, "Token is invalid!")
 
-        return f(*args, **kwargs)
+        return f(token_data, *args, **kwargs)
     return decorated
 
 def error(
@@ -111,19 +110,18 @@ def login_user():
 
 @app.route("/api/item/new", methods=["POST"])
 @token_required
-def add_item():
-    # print(request.form)
+def add_item(token_data):
     name=request.form.get('name')
     description=request.form.get('description')
     category=request.form.get('category')
-    email=request.form.get('email')
+    owner_id=token_data['user_id']
     deposit=request.form.get('deposit')
     overdue_charge=request.form.get('overdue_charge')
     created_at=date.today().strftime("%d/%m/%Y")
     item=Item(name = name,
             description = description,
             category = category,
-            email = email,
+            owner_id = owner_id,
             deposit = deposit,
             overdue_charge = overdue_charge,
             created_at = created_at,)

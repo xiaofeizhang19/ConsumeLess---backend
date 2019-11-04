@@ -7,14 +7,19 @@ import json
 class ItemAPIs(TestSetup):
 
     def test_1_populated(self):
+        newUser = User(username = 'testuser',
+                    email = 'testuser@gmail.com',
+                    password_hash = 'test',
+                    created_at = datetime(2019, 11, 1))
+        db.session.add(newUser)
         newItem = Item(name = 'test',
                     description = "testing",
                     category = 'test',
-                    email = 'test@gmail.com',
+                    owner_id = 1,
                     deposit = 1.00,
                     overdue_charge = 1.00,
                     created_at = datetime(2019, 11, 1))
-        expected_output = b'{"category":"test","created_at":"01/11/2019","deposit":"1.0","description":"testing","email":"test@gmail.com","id":1,"name":"test","overdue_charge":"1.0"}\n'
+        expected_output = b'{"category":"test","created_at":"01/11/2019","deposit":"1.0","description":"testing","id":1,"name":"test","overdue_charge":"1.0","owner_id":1}\n'
         db.session.add(newItem)
         db.session.commit()
         tester = app.test_client(self)
@@ -40,7 +45,7 @@ class ItemAPIs(TestSetup):
         token = json.loads(login.data)['token']
         response = tester.post(
             f'api/item/new?token={token}',
-             data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
+             data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
