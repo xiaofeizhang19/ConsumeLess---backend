@@ -28,3 +28,10 @@ class RouteAPIUserID(TestSetup):
         tester = app.test_client(self)
         response = tester.get('/api/user/1', content_type='html/text')
         self.assertEqual(response.status_code, 404)
+
+class RouteAPICategoryIndex(TestSetup):
+
+    def test_category_index(self):
+        tester = app.test_client(self)
+        response = tester.get("/api/categories/index", content_type="html/text")
+        self.assertEqual(response.status_code, 200)
