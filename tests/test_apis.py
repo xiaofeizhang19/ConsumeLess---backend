@@ -88,7 +88,7 @@ class UserAPIs(TestSetup):
              data=dict(username='new user', password="test")
              ))
 
-class getCategories(TestSetup):
+class CategoriesAPI(TestSetup):
 
     def test_getting_items_by_category(self):
         tester = app.test_client(self)
