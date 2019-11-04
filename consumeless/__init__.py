@@ -36,7 +36,7 @@ def token_required(f):
         if not token:
             return error(403, "Token is missing!")
         try:
-            token_data = jwt.decode(token, app.config.get('SECRET_KEY'))
+            token_data = jwt.decode(token, app.config.get('SECRET_KEY'), algorithms='HS256')
         except:
             return error(407, "Token is invalid!")
 
@@ -164,6 +164,13 @@ class ApiBooking(Resource):
         booking.confirmed = True
         db.session.commit()
         return jsonify(f'Booking {booking.id} confirmed successfully')
+
+    @token_required
+    def delete(token_data, self, b_id):
+        booking = Booking.query.filter_by(id=b_id).first()
+        db.session.delete(booking)
+        db.session.commit()
+        return jsonify(f'Booking deleted')
 
 @app.route("/")
 def reroute_index():
