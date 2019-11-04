@@ -27,7 +27,7 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Item, User
+from models import Item, User, Booking
 
 def token_required(f):
     @wraps(f)
@@ -83,6 +83,23 @@ class ApiUser(Resource):
             return error(404, "User not found")
 
         return jsonify(user.serialize())
+
+class ApiBooking(Resource):
+    @token_required
+    def post(token_data, self, b_id):
+        item_id=request.form.get('item_id')
+        owner_id=Item.query.with_entities(Item.owner_id).filter_by(id=item_id).first()[0]
+        created_by=token_data['user_id']
+        created_at=date.today()
+        return_by=request.form.get('return_by')
+        booking=Booking(item_id = item_id,
+                owner_id = owner_id,
+                created_by = created_by,
+                created_at = created_at,
+                return_by = return_by)
+        db.session.add(booking)
+        db.session.commit()
+        return jsonify(f'{booking.return_by}')
 
 @app.route("/")
 def reroute_index():
@@ -164,6 +181,7 @@ def add_user():
 
 api.add_resource(ApiItem, '/api/item/<i_id>')
 api.add_resource(ApiUser, '/api/user/<u_id>')
+api.add_resource(ApiBooking, '/api/booking/<b_id>')
 
 # if __name__ == '__main__':
 #     app.run()

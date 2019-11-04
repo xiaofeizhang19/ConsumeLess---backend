@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from tests.setup import TestSetup
 from consumeless import app, db
 from models import Item, User
@@ -96,12 +96,11 @@ class CategoriesAPI(TestSetup):
 
     def test_getting_items_by_category(self):
         tester = app.test_client(self)
-        login = tester.post(
+        register = tester.post(
             'api/user/new',
              data=dict(username='new user', email='e@yahoo.com', password='test')
              )
-        token = json.loads(login.data)['token']
-        print(token)
+        token = json.loads(register.data)['token']
         response1 = tester.post(
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
@@ -109,3 +108,24 @@ class CategoriesAPI(TestSetup):
         self.assertEqual(response1.status_code, 200)
         response2 = tester.get("/api/categories/cat", content_type="html/text")
         self.assertIn(b'new item', response2.data)
+
+class BookingsAPI(TestSetup):
+
+    def test_request_booking(self):
+        tester = app.test_client(self)
+        register = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        token = json.loads(register.data)['token']
+        tester.post(
+            f'api/item/new?token={token}',
+             data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
+             )
+        return_date = (date.today() + timedelta(days = 5))
+        bytes_return_date = (str(return_date).encode())
+        response = tester.post(
+            f'api/booking/new?token={token}',
+             data=dict(item_id=1, return_by=return_date)
+             )
+        self.assertIn(bytes_return_date, response.data)

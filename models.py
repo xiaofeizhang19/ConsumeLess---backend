@@ -87,27 +87,26 @@ class Booking(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     return_by = db.Column(db.DateTime, nullable=False)
     confirmed = db.Column(db.Boolean, default=False)
-    lender = db.relationship("User", primaryjoin = "Booking.user_id == User.id", backref="lent_items")
+    lender = db.relationship("User", primaryjoin = "Booking.owner_id == User.id", backref="lent_items")
     borrower = db.relationship("User", primaryjoin = "Booking.created_by == User.id", backref="borrowed_items")
 
-    def __init__(self, item_id, user_id, created_by, created_at, return_by, confirmed):
+    def __init__(self, item_id, owner_id, created_by, created_at, return_by):
         self.item_id = item_id
-        self.user_id = user_id
+        self.owner_id = owner_id
         self.created_by = created_by
         self.created_at = created_at
         self.return_by = return_by
-        self.confirmed = confirmed
 
     def serialize(self):
         return {
             'id': self.id,
             'item_id': self.item_id,
-            'user_id': self.user_id,
+            'owner_id': self.owner_id,
             'created_by': self.created_by,
             'created_at': self.created_at,
             'return_by': self.return_by,
