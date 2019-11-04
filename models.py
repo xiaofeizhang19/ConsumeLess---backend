@@ -14,7 +14,6 @@ class Item(db.Model):
     overdue_charge = db.Column(db.Numeric(), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     available = db.Column(db.Boolean, default=True)
-    bookings = db.relationship('Booking', backref = 'items', cascade = 'all, delete-orphan', lazy = 'dynamic')
 
     def __init__(self, name, description, category, email, deposit, overdue_charge, created_at):
         self.name = name
@@ -48,7 +47,6 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
-    bookings = db.relationship('Booking', backref = 'users', cascade = 'all, delete-orphan', lazy = 'dynamic')
 
     def __init__(self, username, email, password_hash, created_at):
         self.username = username
@@ -93,6 +91,8 @@ class Booking(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     return_by = db.Column(db.DateTime, nullable=False)
     confirmed = db.Column(db.Boolean, default=False)
+    lender = db.relationship("User", primaryjoin = "Booking.user_id == User.id", backref="lent_items")
+    borrower = db.relationship("User", primaryjoin = "Booking.created_by == User.id", backref="borrowed_items")
 
     def __init__(self, item_id, user_id, created_by, created_at, return_by, confirmed):
         self.item_id = item_id
