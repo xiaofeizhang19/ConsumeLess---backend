@@ -158,6 +158,13 @@ class ApiBooking(Resource):
         db.session.commit()
         return jsonify(f'{booking.return_by}')
 
+    @token_required
+    def patch(token_data, self, b_id):
+        booking = Booking.query.filter_by(id=b_id).first()
+        booking.confirmed = True
+        db.session.commit
+        return jsonify(f'Booking {booking.id} confirmed successfully')
+
 @app.route("/")
 def reroute_index():
     return redirect(url_for('get_all_items'))
