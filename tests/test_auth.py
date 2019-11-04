@@ -3,10 +3,11 @@ from tests.setup import TestSetup
 from consumeless import app, db
 from models import User
 import json
+import jwt
 
-class SuccessfulLogin(TestSetup):
+class Login(TestSetup):
 
-    def test_login(self):
+    def test_successful(self):
         tester = app.test_client(self)
         tester.post(
             'api/user/new',
@@ -16,15 +17,14 @@ class SuccessfulLogin(TestSetup):
             'login',
              data=dict(username='new user', password='test')
              )
+        response_message = json.loads(response.data)['message']
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            json.loads(response.data),
-            {'message': 'Well done'},
+            response_message,
+            'successfully logged in user: new user',
         )
 
-class UnsuccessfulLogin(TestSetup):
-
-    def test_login(self):
+    def test_invalid_password(self):
         tester = app.test_client(self)
         tester.post(
             'api/user/new',
@@ -40,9 +40,7 @@ class UnsuccessfulLogin(TestSetup):
             {"error": "Invalid password"},
         )
 
-class MoreUnsuccessfulLogin(TestSetup):
-
-    def test_login(self):
+    def test_insufficient_info(self):
         tester = app.test_client(self)
         tester.post(
             'api/user/new',
@@ -58,9 +56,7 @@ class MoreUnsuccessfulLogin(TestSetup):
             {"error": "Insufficient information"},
         )
 
-class UnsuccessfulLoginWhenUserDoesNotExist(TestSetup):
-
-    def test_login(self):
+    def test_user_does_not_exist(self):
         tester = app.test_client(self)
         response = tester.post(
             'login',
@@ -71,3 +67,42 @@ class UnsuccessfulLoginWhenUserDoesNotExist(TestSetup):
             json.loads(response.data),
             {"error": "User does not exist"},
         )
+
+    def test_token_created(self):
+        tester = app.test_client(self)
+        register = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        login = tester.post(
+            'login',
+             data=dict(username='new user', password='test')
+             )
+        token = json.loads(login.data)['token']
+        self.assertTrue(jwt.decode(token, app.config.get('SECRET_KEY')))
+
+class Register(TestSetup):
+
+    def test_token_created(self):
+        tester = app.test_client(self)
+        register = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        token = json.loads(register.data)['token']
+        self.assertTrue(jwt.decode(token, app.config.get('SECRET_KEY')))
+
+class AddNewItem(TestSetup):
+
+    def test_token_required(self):
+        tester = app.test_client(self)
+        register = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        response = tester.post(
+            'api/item/new',
+             data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
+             )
+        forbidden_error_code = 403
+        self.assertEqual(response.status_code, forbidden_error_code)
