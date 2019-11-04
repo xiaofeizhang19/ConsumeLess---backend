@@ -92,6 +92,29 @@ class Register(TestSetup):
         token = json.loads(register.data)['token']
         self.assertTrue(jwt.decode(token, app.config.get('SECRET_KEY')))
 
+    def test_error_if_user_already_exists(self):
+        tester = app.test_client(self)
+        response = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        self.assertEqual(response.status_code, 200)
+        self.assertRaises( Exception, tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        )
+
+    def test_user_added_to_database(self):
+        tester = app.test_client(self)
+        response = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn( 'successfully added user: new user', json.loads(response.data)['message']
+        )
+
 class AddNewItem(TestSetup):
 
     def test_token_required(self):
