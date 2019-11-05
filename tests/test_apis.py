@@ -69,6 +69,27 @@ class ItemAPIs(TestSetup):
              data=dict(name='new item', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
              ))
 
+    def test_my_items_displayed(self):
+        tester = app.test_client()
+        # register a user and get token
+        register = tester.post(
+            'api/user/new',
+             data=dict(username='new user', email='e@yahoo.com', password='test')
+             )
+        token = json.loads(register.data)['token']
+        # add an item to db
+        tester.post(
+            f'api/item/new?token={token}',
+             data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
+             )
+        # access our items
+        response = tester.get(
+            f'api/items?token={token}',
+            content_type='html/text'
+            )
+        self.assertIn(b'new item', response.data)
+
+    # def test_only_my_items_displayed(self):
 
 class UserAPIs(TestSetup):
 

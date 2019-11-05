@@ -72,6 +72,13 @@ def get_all_items():
     items=Item.query.all()
     return jsonify([e.serialize() for e in items])
 
+@app.route("/api/items")
+@token_required
+def get_all_my_items(token_data):
+    owner_id = token_data['user_id']
+    items=Item.query.filter_by(owner_id=owner_id).all()
+    return jsonify([e.serialize() for e in items])
+
 class ApiItem(Resource):
     def get(self, i_id):
         item = Item.query.filter_by(id=i_id).first()
