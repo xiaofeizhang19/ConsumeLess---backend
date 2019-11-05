@@ -133,7 +133,10 @@ class ApiUser(Resource):
             user=User(username = username,
                     email = email,
                     password_hash = password_hash,
-                    created_at = created_at,)
+                    created_at = created_at,
+                    postcode = postcode,
+                    latitude = latitude,
+                    longitude = longitude)
             db.session.add(user)
             db.session.commit()
             token = (repr(user.encode_auth_token(user.id))[2:-1])

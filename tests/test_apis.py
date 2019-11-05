@@ -10,7 +10,10 @@ class ItemAPIs(TestSetup):
         newUser = User(username = 'testuser',
                     email = 'testuser@gmail.com',
                     password_hash = 'test',
-                    created_at = datetime(2019, 11, 1))
+                    created_at = datetime(2019, 11, 1),
+                    postcode = 'e49qr',
+                    latitude = 51.7655451,
+                    longitude = -1.257095)
         db.session.add(newUser)
         newItem = Item(name = 'test',
                     description = "testing",
@@ -107,8 +110,11 @@ class UserAPIs(TestSetup):
         newUser = User(username = 'testuser',
                     email = 'testuser@gmail.com',
                     password_hash = 'test',
-                    created_at = datetime(2019, 11, 1))
-        expected_output = b'{"created_at":"01/11/2019","email":"testuser@gmail.com","id":1,"username":"testuser"}\n'
+                    created_at = datetime(2019, 11, 1),
+                    postcode = 'e49qr',
+                    latitude = 51.7655451,
+                    longitude = -1.257095)
+        expected_output = b'{"created_at":"01/11/2019","email":"testuser@gmail.com","id":1,"latitude":51.7655451,"longitude":-1.257095,"postcode":"e49qr","username":"testuser"}\n'
         db.session.add(newUser)
         db.session.commit()
         tester = app.test_client(self)
