@@ -12,6 +12,7 @@ from flask import (
     make_response,
 )
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_restful import Resource, Api
 from flask_cors import CORS
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -85,10 +86,22 @@ def get_all_my_items(token_data):
 class ApiItem(Resource):
     def get(self, i_id):
         item = Item.query.filter_by(id=i_id).first()
+        t = text("select users.latitude from users, items where users.id = items.owner_id ;")
+        latitude = db.session.execute(t).first()
+        t = text("select users.longitude from users, items where users.id = items.owner_id ;")
+        longitude = db.session.execute(t).first()
+        # result = db.session.query(Item, User).filter(User.id == Item.owner_id).all()
+        print(latitude)
+        print(longitude)
         if item is None:
             return error(404, "Item not found")
 
-        return jsonify(item.serialize())
+        item_hash = item.serialize()
+        item_hash['latitude'] = 51.7655451
+        item_hash['longitude'] = -1.257095
+
+        print(item_hash)
+        return jsonify(item_hash)
 
     @token_required
     def post(token_data, self, i_id):
