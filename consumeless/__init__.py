@@ -18,6 +18,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 from functools import wraps
+import requests
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -26,6 +28,7 @@ api = Api(app)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+API_KEY = os.environ['GOOGLE_API_KEY']
 
 from models import Item, User, Booking
 
@@ -122,6 +125,10 @@ class ApiUser(Resource):
         email=request.form.get('email')
         password_hash=generate_password_hash(request.form.get('password'))
         created_at=date.today().strftime("%d/%m/%Y")
+        postcode=request.form.get('postcode')
+        long_lat = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?components=country:GB|postal_code:ox26sq&key={API_KEY}')
+        latitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lat']
+        longitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lng']
         try:
             user=User(username = username,
                     email = email,
