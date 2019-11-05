@@ -88,8 +88,18 @@ class ItemAPIs(TestSetup):
             content_type='html/text'
             )
         self.assertIn(b'new item', response.data)
-
-    # def test_only_my_items_displayed(self):
+        # register a new user and get new token
+        register = tester.post(
+            'api/user/new',
+             data=dict(username='second user', email='e2@yahoo.com', password='test')
+             )
+        token = json.loads(register.data)['token']
+        # access our items, as different user (expect none)
+        response = tester.get(
+            f'api/items?token={token}',
+            content_type='html/text'
+            )
+        self.assertNotIn(b'new item', response.data)
 
 class UserAPIs(TestSetup):
 
