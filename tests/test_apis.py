@@ -101,6 +101,9 @@ class ItemAPIs(TestSetup):
             )
         self.assertNotIn(b'new item', response.data)
 
+    def dud_test_for_circle_ci(TestSetup):
+        assert True
+
 class UserAPIs(TestSetup):
 
     def test_user_1_populated(self):
