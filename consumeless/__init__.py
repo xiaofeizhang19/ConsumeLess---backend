@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import jwt
 from flask import (
     abort,
@@ -136,9 +136,13 @@ class ApiUser(Resource):
         password_hash=generate_password_hash(request.form.get('password'))
         created_at=date.today().strftime("%d/%m/%Y")
         postcode=request.form.get('postcode')
-        long_lat = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?components=country:GB|postal_code:ox26sq&key={API_KEY}')
-        latitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lat']
-        longitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lng']
+        if app.config['TESTING'] == True:
+            latitude = 51.51746
+            longitude = -0.07329
+        else:
+            long_lat = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?components=country:GB|postal_code:ox26sq&key={API_KEY}')
+            latitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lat']
+            longitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lng']
         try:
             user=User(username = username,
                     email = email,
@@ -182,7 +186,8 @@ class ApiBooking(Resource):
         owner_id=Item.query.with_entities(Item.owner_id).filter_by(id=item_id).first()[0]
         created_by=token_data['user_id']
         created_at=date.today()
-        return_by=request.form.get('return_by')
+        days_requested=request.form.get('return_by')
+        return_by=(datetime.utcnow() + timedelta(days=int(days_requested)))
         booking=Booking(item_id = item_id,
                 owner_id = owner_id,
                 created_by = created_by,
@@ -190,7 +195,7 @@ class ApiBooking(Resource):
                 return_by = return_by)
         db.session.add(booking)
         db.session.commit()
-        return jsonify(f'{booking.return_by}')
+        return jsonify(f'{booking.return_by.strftime("%d/%m/%Y")}')
 
     @token_required
     def patch(token_data, self, b_id):

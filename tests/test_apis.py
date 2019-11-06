@@ -161,11 +161,12 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
-        bytes_return_date = (str(return_date).encode())
+        return_in = 7
+        return_by = (datetime.utcnow() + timedelta(days=int(return_in))).strftime("%d/%m/%Y")
+        bytes_return_date = (str(return_by).encode())
         response = tester.post(
             f'api/booking/new?token={token}',
-             data=dict(item_id=1, return_by=return_date)
+             data=dict(item_id=1, return_by=return_in)
              )
         self.assertIn(bytes_return_date, response.data)
 
@@ -180,13 +181,13 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
+        return_in = 5
         tester.post(
             f'api/booking/new?token={token}',
-             data=dict(item_id=1, return_by=return_date)
+             data=dict(item_id=1, return_by=return_in)
              )
-        return_date = (date.today() + timedelta(days = 5)).strftime("%d/%m/%Y")
-        bytes_return_date = (str(return_date).encode())
+        return_by = (datetime.utcnow() + timedelta(days=int(return_in))).strftime("%d/%m/%Y")
+        bytes_return_date = (str(return_by).encode())
         response = tester.get(
             f'api/booking/requests?token={token}',
             content_type='html/text'
@@ -204,13 +205,13 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
+        return_in = 7
         tester.post(
             f'api/booking/new?token={token}',
-             data=dict(item_id=1, return_by=return_date)
+             data=dict(item_id=1, return_by=return_in)
              )
-        return_date = (date.today() + timedelta(days = 5)).strftime("%d/%m/%Y")
-        bytes_return_date = (str(return_date).encode())
+        return_by = (datetime.utcnow() + timedelta(days=int(return_in))).strftime("%d/%m/%Y")
+        bytes_return_date = (str(return_by).encode())
         tester.patch(
             f'api/booking/1?token={token}',
             data=dict(confirmed=True)
@@ -234,7 +235,7 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
+        return_date = 5
         # request a booking
         tester.post(
             f'api/booking/new?token={token}',
@@ -265,7 +266,7 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
+        return_date = 5
         # request a booking
         tester.post(
             f'api/booking/new?token={token}',
