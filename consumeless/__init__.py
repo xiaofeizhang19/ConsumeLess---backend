@@ -192,7 +192,7 @@ class ApiBooking(Resource):
                 return_by = return_by)
         db.session.add(booking)
         db.session.commit()
-        return jsonify(f'{booking.return_by}')
+        return jsonify(f'{booking.return_by.strftime("%d/%m/%Y")}')
 
     @token_required
     def patch(token_data, self, b_id):
