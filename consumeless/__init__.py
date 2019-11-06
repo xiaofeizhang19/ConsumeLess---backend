@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import jwt
 from flask import (
     abort,
@@ -12,12 +12,15 @@ from flask import (
     make_response,
 )
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_restful import Resource, Api
 from flask_cors import CORS
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 from functools import wraps
+import requests
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -26,6 +29,7 @@ api = Api(app)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+API_KEY = os.environ['GOOGLE_API_KEY']
 
 from models import Item, User, Booking
 
@@ -82,10 +86,20 @@ def get_all_my_items(token_data):
 class ApiItem(Resource):
     def get(self, i_id):
         item = Item.query.filter_by(id=i_id).first()
+
         if item is None:
             return error(404, "Item not found")
 
-        return jsonify(item.serialize())
+        t = text("select users.latitude from users, items where users.id = items.owner_id ;")
+        latitude = db.session.execute(t).first()
+        t = text("select users.longitude from users, items where users.id = items.owner_id ;")
+        longitude = db.session.execute(t).first()
+
+        item_hash = item.serialize()
+        item_hash['latitude'] = latitude[0]
+        item_hash['longitude'] = longitude[0]
+
+        return jsonify(item_hash)
 
     @token_required
     def post(token_data, self, i_id):
@@ -122,11 +136,22 @@ class ApiUser(Resource):
         email=request.form.get('email')
         password_hash=generate_password_hash(request.form.get('password'))
         created_at=date.today().strftime("%d/%m/%Y")
+        postcode=request.form.get('postcode')
+        if app.config['TESTING'] == True:
+            latitude = 51.51746
+            longitude = -0.07329
+        else:
+            long_lat = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?components=country:GB|postal_code:ox26sq&key={API_KEY}')
+            latitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lat']
+            longitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lng']
         try:
             user=User(username = username,
                     email = email,
                     password_hash = password_hash,
-                    created_at = created_at,)
+                    created_at = created_at,
+                    postcode = postcode,
+                    latitude = latitude,
+                    longitude = longitude)
             db.session.add(user)
             db.session.commit()
             token = (repr(user.encode_auth_token(user.id))[2:-1])
@@ -162,7 +187,8 @@ class ApiBooking(Resource):
         owner_id=Item.query.with_entities(Item.owner_id).filter_by(id=item_id).first()[0]
         created_by=token_data['user_id']
         created_at=date.today()
-        return_by=request.form.get('return_by')
+        days_requested=request.form.get('return_by')
+        return_by=(datetime.utcnow() + timedelta(days=int(days_requested)))
         booking=Booking(item_id = item_id,
                 owner_id = owner_id,
                 created_by = created_by,
@@ -170,7 +196,7 @@ class ApiBooking(Resource):
                 return_by = return_by)
         db.session.add(booking)
         db.session.commit()
-        return jsonify(f'{booking.return_by}')
+        return jsonify(f'{booking.return_by.strftime("%d/%m/%Y")}')
 
     @token_required
     def patch(token_data, self, b_id):

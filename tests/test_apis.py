@@ -10,7 +10,10 @@ class ItemAPIs(TestSetup):
         newUser = User(username = 'testuser',
                     email = 'testuser@gmail.com',
                     password_hash = 'test',
-                    created_at = datetime(2019, 11, 1))
+                    created_at = datetime(2019, 11, 1),
+                    postcode = 'e49qr',
+                    latitude = 51.7655451,
+                    longitude = -1.257095)
         db.session.add(newUser)
         newItem = Item(name = 'test',
                     description = "testing",
@@ -19,11 +22,13 @@ class ItemAPIs(TestSetup):
                     deposit = 1.00,
                     overdue_charge = 1.00,
                     created_at = datetime(2019, 11, 1))
-        expected_output = b'{"category":"test","created_at":"01/11/2019","deposit":"1.0","description":"testing","id":1,"name":"test","overdue_charge":"1.0","owner_id":1}\n'
+        expected_output = b'{"category":"test","created_at":"01/11/2019","deposit":"1.0","description":"testing","id":1,"latitude":51.7655451,"longitude":-1.257095,"name":"test","overdue_charge":"1.0","owner_id":1}\n'
         db.session.add(newItem)
         db.session.commit()
         tester = app.test_client(self)
         response = tester.get('api/item/1', content_type='html/text')
+        print(response.data)
+        # print(blah)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_output)
 
@@ -107,8 +112,11 @@ class UserAPIs(TestSetup):
         newUser = User(username = 'testuser',
                     email = 'testuser@gmail.com',
                     password_hash = 'test',
-                    created_at = datetime(2019, 11, 1))
-        expected_output = b'{"created_at":"01/11/2019","email":"testuser@gmail.com","id":1,"username":"testuser"}\n'
+                    created_at = datetime(2019, 11, 1),
+                    postcode = 'e49qr',
+                    latitude = 51.7655451,
+                    longitude = -1.257095)
+        expected_output = b'{"created_at":"01/11/2019","email":"testuser@gmail.com","id":1,"latitude":51.7655451,"longitude":-1.257095,"postcode":"e49qr","username":"testuser"}\n'
         db.session.add(newUser)
         db.session.commit()
         tester = app.test_client(self)
@@ -153,11 +161,12 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
-        bytes_return_date = (str(return_date).encode())
+        return_in = 7
+        return_by = (datetime.utcnow() + timedelta(days=int(return_in))).strftime("%d/%m/%Y")
+        bytes_return_date = (str(return_by).encode())
         response = tester.post(
             f'api/booking/new?token={token}',
-             data=dict(item_id=1, return_by=return_date)
+             data=dict(item_id=1, return_by=return_in)
              )
         self.assertIn(bytes_return_date, response.data)
 
@@ -172,13 +181,13 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
+        return_in = 5
         tester.post(
             f'api/booking/new?token={token}',
-             data=dict(item_id=1, return_by=return_date)
+             data=dict(item_id=1, return_by=return_in)
              )
-        return_date = (date.today() + timedelta(days = 5)).strftime("%d/%m/%Y")
-        bytes_return_date = (str(return_date).encode())
+        return_by = (datetime.utcnow() + timedelta(days=int(return_in))).strftime("%d/%m/%Y")
+        bytes_return_date = (str(return_by).encode())
         response = tester.get(
             f'api/booking/requests?token={token}',
             content_type='html/text'
@@ -196,13 +205,13 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
+        return_in = 7
         tester.post(
             f'api/booking/new?token={token}',
-             data=dict(item_id=1, return_by=return_date)
+             data=dict(item_id=1, return_by=return_in)
              )
-        return_date = (date.today() + timedelta(days = 5)).strftime("%d/%m/%Y")
-        bytes_return_date = (str(return_date).encode())
+        return_by = (datetime.utcnow() + timedelta(days=int(return_in))).strftime("%d/%m/%Y")
+        bytes_return_date = (str(return_by).encode())
         tester.patch(
             f'api/booking/1?token={token}',
             data=dict(confirmed=True)
@@ -226,7 +235,7 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
+        return_date = 5
         # request a booking
         tester.post(
             f'api/booking/new?token={token}',
@@ -257,7 +266,7 @@ class BookingsAPI(TestSetup):
             f'api/item/new?token={token}',
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
-        return_date = (date.today() + timedelta(days = 5))
+        return_date = 5
         # request a booking
         tester.post(
             f'api/booking/new?token={token}',
