@@ -101,12 +101,11 @@ class ApiItem(Resource):
         deposit=request.form.get('deposit')
         overdue_charge=request.form.get('overdue_charge')
         created_at=date.today().strftime("%d/%m/%Y")
-
         t = text(f"select users.latitude from users, items where users.id = {owner_id} ;")
-        latitude = db.session.execute(t).first()[0]
+        latitude = db.session.execute(t).first()[0] if db.session.execute(t).first() else None
         t = text(f"select users.longitude from users, items where users.id = {owner_id} ;")
-        longitude = db.session.execute(t).first()[0]
-
+        longitude = db.session.execute(t).first()[0] if db.session.execute(t).first() else None
+        print(longitude)
         item=Item(name = name,
                 description = description,
                 category = category,

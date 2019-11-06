@@ -21,7 +21,9 @@ class ItemAPIs(TestSetup):
                     owner_id = 1,
                     deposit = 1.00,
                     overdue_charge = 1.00,
-                    created_at = datetime(2019, 11, 1))
+                    created_at = datetime(2019, 11, 1),
+                    longitude = -1.257095,
+                    latitude = 51.7655451,)
         expected_output = b'{"category":"test","created_at":"01/11/2019","deposit":"1.0","description":"testing","id":1,"latitude":51.7655451,"longitude":-1.257095,"name":"test","overdue_charge":"1.0","owner_id":1}\n'
         db.session.add(newItem)
         db.session.commit()
@@ -45,7 +47,7 @@ class ItemAPIs(TestSetup):
         tester = app.test_client(self)
         login = tester.post(
             'api/user/new',
-             data=dict(username='new user', email='e@yahoo.com', password='test')
+             data=dict(username='new user', email='e@yahoo.com', password='test', postcode='ox26sq')
              )
         token = json.loads(login.data)['token']
         response = tester.post(
@@ -137,7 +139,7 @@ class CategoriesAPI(TestSetup):
         tester = app.test_client(self)
         register = tester.post(
             'api/user/new',
-             data=dict(username='new user', email='e@yahoo.com', password='test')
+             data=dict(username='new user', email='e@yahoo.com', password='test', postcode="e49qr")
              )
         token = json.loads(register.data)['token']
         response1 = tester.post(
