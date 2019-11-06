@@ -164,8 +164,8 @@ class ApiUser(Resource):
 @token_required
 def get_all_my_bookings(token_data):
     created_by = token_data['user_id']
-    bookings=Booking.query.filter_by(created_by=created_by, confirmed=True).all()
-    return jsonify([e.serialize() for e in bookings])
+    items = Item.query.join(Booking).filter_by(created_by = created_by, confirmed=True).all()
+    return jsonify([e.serialize() for e in items])
 
 class ApiBooking(Resource):
     @token_required
@@ -175,8 +175,8 @@ class ApiBooking(Resource):
         else:
             confirmed = True
         owner_id = token_data['user_id']
-        bookings = Booking.query.filter_by(owner_id=owner_id, confirmed=confirmed).all()
-        return jsonify([e.serialize() for e in bookings])
+        items = Item.query.join(Booking).filter_by(owner_id = owner_id, confirmed=confirmed).all()
+        return jsonify([e.serialize() for e in items])
 
 
     @token_required

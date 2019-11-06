@@ -188,13 +188,11 @@ class BookingsAPI(TestSetup):
             f'api/booking/new?token={token}',
              data=dict(item_id=1, return_by=return_in)
              )
-        return_by = (datetime.utcnow() + timedelta(days=int(return_in))).strftime("%d/%m/%Y")
-        bytes_return_date = (str(return_by).encode())
         response = tester.get(
             f'api/booking/requests?token={token}',
             content_type='html/text'
         )
-        self.assertIn(bytes_return_date, response.data)
+        self.assertIn(b'new item', response.data)
 
     def test_get_bookings_confirmed(self):
         tester = app.test_client()
@@ -212,8 +210,6 @@ class BookingsAPI(TestSetup):
             f'api/booking/new?token={token}',
              data=dict(item_id=1, return_by=return_in)
              )
-        return_by = (datetime.utcnow() + timedelta(days=int(return_in))).strftime("%d/%m/%Y")
-        bytes_return_date = (str(return_by).encode())
         tester.patch(
             f'api/booking/1?token={token}',
             data=dict(confirmed=True)
@@ -222,7 +218,7 @@ class BookingsAPI(TestSetup):
             f'api/booking/confirmed?token={token}',
             content_type='html/text'
         )
-        self.assertIn(bytes_return_date, response.data)
+        self.assertIn(b'new item', response.data)
 
     def test_reject_booking(self):
         tester = app.test_client()
@@ -269,7 +265,7 @@ class BookingsAPI(TestSetup):
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
         return_date = 5
-        # request a booking
+        #request a booking
         tester.post(
             f'api/booking/new?token={token}',
              data=dict(item_id=1, return_by=return_date)
@@ -283,4 +279,4 @@ class BookingsAPI(TestSetup):
             f'api/bookings?token={token}',
             content_type='html/text'
         )
-        self.assertIn(b'"confirmed":true',response.data )
+        self.assertIn(b'new item',response.data )
