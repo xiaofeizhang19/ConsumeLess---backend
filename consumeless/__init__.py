@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import jwt
 from flask import (
     abort,
@@ -183,7 +183,8 @@ class ApiBooking(Resource):
         owner_id=Item.query.with_entities(Item.owner_id).filter_by(id=item_id).first()[0]
         created_by=token_data['user_id']
         created_at=date.today()
-        return_by=request.form.get('return_by')
+        days_requested=request.form.get('return_by')
+        return_by=(datetime.utcnow() + timedelta(days=int(days_requested)))
         booking=Booking(item_id = item_id,
                 owner_id = owner_id,
                 created_by = created_by,
