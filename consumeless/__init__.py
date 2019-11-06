@@ -137,9 +137,13 @@ class ApiUser(Resource):
         password_hash=generate_password_hash(request.form.get('password'))
         created_at=date.today().strftime("%d/%m/%Y")
         postcode=request.form.get('postcode')
-        long_lat = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?components=country:GB|postal_code:ox26sq&key={API_KEY}')
-        latitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lat']
-        longitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lng']
+        if app.config['TESTING'] == True:
+            latitude = 51.51746
+            longitude = -0.07329
+        else:
+            long_lat = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?components=country:GB|postal_code:ox26sq&key={API_KEY}')
+            latitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lat']
+            longitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lng']
         try:
             user=User(username = username,
                     email = email,
