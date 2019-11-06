@@ -269,7 +269,7 @@ class BookingsAPI(TestSetup):
              data=dict(name='new item', description='test description', category='cat', deposit=1.00, overdue_charge=1.00)
              )
         return_date = 5
-        # request a booking
+        #request a booking
         tester.post(
             f'api/booking/new?token={token}',
              data=dict(item_id=1, return_by=return_date)
@@ -283,4 +283,4 @@ class BookingsAPI(TestSetup):
             f'api/bookings?token={token}',
             content_type='html/text'
         )
-        self.assertIn(b'"confirmed":true',response.data )
+        self.assertIn(b'new item',response.data )
