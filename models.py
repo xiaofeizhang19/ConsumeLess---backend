@@ -15,8 +15,10 @@ class Item(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     available = db.Column(db.Boolean, default=True)
     owner = db.relationship("User", primaryjoin = "Item.owner_id == User.id", backref="owner")
+    longitude = db.Column(db.Float, nullable=True)
+    latitude = db.Column(db.Float, nullable=True)
 
-    def __init__(self, name, description, category, owner_id, deposit, overdue_charge, created_at):
+    def __init__(self, name, description, category, owner_id, deposit, overdue_charge, created_at,latitude, longitude):
         self.name = name
         self.description = description
         self.category = category
@@ -24,6 +26,8 @@ class Item(db.Model):
         self.deposit = deposit
         self.overdue_charge = overdue_charge
         self.created_at = created_at
+        self.longitude = longitude
+        self.latitude = latitude
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -37,7 +41,9 @@ class Item(db.Model):
             'owner_id': self.owner_id,
             'deposit': str(self.deposit),
             'overdue_charge': str(self.overdue_charge),
-            'created_at': self.created_at.strftime("%d/%m/%Y")
+            'created_at': self.created_at.strftime("%d/%m/%Y"),
+            'longitude': self.longitude,
+            'latitude': self.latitude
         }
 
 class User(db.Model):
