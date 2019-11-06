@@ -90,16 +90,7 @@ class ApiItem(Resource):
         if item is None:
             return error(404, "Item not found")
 
-        t = text("select users.latitude from users, items where users.id = items.owner_id ;")
-        latitude = db.session.execute(t).first()
-        t = text("select users.longitude from users, items where users.id = items.owner_id ;")
-        longitude = db.session.execute(t).first()
-
-        item_hash = item.serialize()
-        item_hash['latitude'] = latitude[0]
-        item_hash['longitude'] = longitude[0]
-
-        return jsonify(item_hash)
+        return jsonify(item.serialize())
 
     @token_required
     def post(token_data, self, i_id):
@@ -110,13 +101,21 @@ class ApiItem(Resource):
         deposit=request.form.get('deposit')
         overdue_charge=request.form.get('overdue_charge')
         created_at=date.today().strftime("%d/%m/%Y")
+
+        t = text(f"select users.latitude from users, items where users.id = {owner_id} ;")
+        latitude = db.session.execute(t).first()[0]
+        t = text(f"select users.longitude from users, items where users.id = {owner_id} ;")
+        longitude = db.session.execute(t).first()[0]
+
         item=Item(name = name,
                 description = description,
                 category = category,
                 owner_id = owner_id,
                 deposit = deposit,
                 overdue_charge = overdue_charge,
-                created_at = created_at,)
+                created_at = created_at,
+                longitude = longitude,
+                latitude = latitude)
         db.session.add(item)
         db.session.commit()
         return jsonify(
