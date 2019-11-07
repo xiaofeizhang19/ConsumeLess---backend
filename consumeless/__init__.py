@@ -139,7 +139,7 @@ class ApiUser(Resource):
             latitude = 51.51746
             longitude = -0.07329
         else:
-            long_lat = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?components=country:GB|postal_code:ox26sq&key={API_KEY}')
+            long_lat = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?components=country:GB|postal_code:{postcode}&key={API_KEY}')
             latitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lat']
             longitude = json.loads(long_lat.content)['results'][0]['geometry']['location']['lng']
         try:
@@ -175,8 +175,8 @@ class ApiBooking(Resource):
         else:
             confirmed = True
         owner_id = token_data['user_id']
-        bookings = Booking.query.filter_by(owner_id=owner_id, confirmed=confirmed).all()
-        return jsonify([e.serialize() for e in bookings])
+        items = Item.query.join(Booking).filter_by(owner_id = owner_id, confirmed=confirmed).all()
+        return jsonify([e.serialize() for e in items])
 
 
     @token_required
