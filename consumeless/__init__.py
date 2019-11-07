@@ -197,8 +197,8 @@ class ApiBooking(Resource):
         return jsonify(f'{booking.return_by.strftime("%d/%m/%Y")}')
 
     @token_required
-    def patch(token_data, self, item_id):
-        booking = Booking.query.filter_by(item_id=item_id).first()
+    def patch(token_data, self, b_id):
+        booking = Booking.query.filter_by(item_id=b_id).first()
         booking.confirmed = True
         db.session.commit()
         return jsonify(f'Booking {booking.id} confirmed successfully')
