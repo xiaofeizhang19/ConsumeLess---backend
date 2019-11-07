@@ -175,8 +175,24 @@ class ApiBooking(Resource):
         else:
             confirmed = True
         owner_id = token_data['user_id']
-        items = Item.query.join(Booking).filter_by(owner_id = owner_id, confirmed=confirmed).all()
-        return jsonify([e.serialize() for e in items])
+        q = text(f"select items.*, bookings.return_by, users.username from items, bookings, users where bookings.owner_id = '{owner_id}' and items.id = bookings.item_id and users.id = bookings.created_by ;")
+        response = db.session.execute(q).fetchall() if db.session.execute(q).fetchall() else []
+        def create_booking_item(response):
+            return{'id': response.id,
+           'name': response.name,
+           'description': response.description,
+           'category': response.category,
+           'owner_id': response.owner_id,
+           'deposit': str(response.deposit),
+           'overdue_charge': str(response.overdue_charge),
+           'created_at': response.created_at.strftime("%d/%m/%Y"),
+           'longitude': response.longitude,
+           'latitude': response.latitude,
+           'return_by': response.return_by,
+           'username': response.username
+           }
+        booking_items = list(map(create_booking_item, response))
+        return jsonify(booking_items)
 
 
     @token_required
