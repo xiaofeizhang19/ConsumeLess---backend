@@ -142,12 +142,15 @@ class CategoriesAPI(TestSetup):
              data=dict(username='new user', email='e@yahoo.com', password='test', postcode="e49qr")
              )
         token = json.loads(register.data)['token']
-        response1 = tester.post(
+        tester.post(
             f'api/item/new?token={token}',
-             data=dict(name='new item', description='test description', category='cat', email='e@yahoo.com', deposit=1.00, overdue_charge=1.00)
+             data=dict(name='new item', description='test description', category='clothes', deposit=1.00, overdue_charge=1.00)
              )
-        self.assertEqual(response1.status_code, 200)
-        response2 = tester.get("/api/categories/cat", content_type="html/text")
+        tester.post(
+             f'api/item/new?token={token}',
+              data=dict(name='other item', description='test item', category='clothes', deposit=1.00, overdue_charge=1.00)
+              )
+        response2 = tester.get("/api/categories/clothes", content_type="html/text")
         self.assertIn(b'new item', response2.data)
 
 class BookingsAPI(TestSetup):
