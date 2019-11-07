@@ -18,7 +18,7 @@ class Item(db.Model):
     longitude = db.Column(db.Float, nullable=True)
     latitude = db.Column(db.Float, nullable=True)
 
-    def __init__(self, name, description, category, owner_id, deposit, overdue_charge, created_at,latitude, longitude):
+    def __init__(self, name, description, category, owner_id, deposit, overdue_charge, created_at, latitude, longitude):
         self.name = name
         self.description = description
         self.category = category
