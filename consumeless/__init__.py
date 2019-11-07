@@ -236,8 +236,26 @@ def login_user():
 
 @app.route("/api/categories/<cat>")
 def get_items_by_category(cat):
-    items = Item.query.filter_by(category=cat).all()
-    return jsonify([e.serialize() for e in items])
+    # items = Item.query.filter_by(category=cat).all()
+    q = text(f"select * from items where category = '{cat}' and items.id not in (select item_id from bookings where item_id = items.id) ;")
+    response = db.session.execute(q).fetchall() if db.session.execute(q).fetchall() else None
+    print(response)
+    def create_item(item):
+         return {   'id': item.id,
+            'name': item.name,
+            'description': item.description,
+            'category': item.category,
+            'owner_id': item.owner_id,
+            'deposit': str(item.deposit),
+            'overdue_charge': str(item.overdue_charge),
+            'created_at': item.created_at.strftime("%d/%m/%Y"),
+            'longitude': item.longitude,
+            'latitude': item.latitude
+            }
+    items = list(map(create_item, response))
+    print(items)
+
+    return jsonify(items)
 
 api.add_resource(ApiItem, '/api/item/<i_id>')
 api.add_resource(ApiUser, '/api/user/<u_id>')
