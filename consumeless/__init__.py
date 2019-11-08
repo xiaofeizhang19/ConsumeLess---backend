@@ -44,7 +44,7 @@ def token_required(f):
         except:
             return error(407, "Token is invalid!")
 
-        return f(token_data, *args, **kwargs)
+        return f(*args, **kwargs, token_data=token_data)
     return decorated
 
 def error(
@@ -93,7 +93,7 @@ class ApiItem(Resource):
         return jsonify(item.serialize())
 
     @token_required
-    def post(token_data, self, i_id):
+    def post(self, i_id, token_data):
         name=request.form.get('name')
         description=request.form.get('description')
         category=request.form.get('category')
@@ -164,7 +164,7 @@ class ApiUser(Resource):
 @token_required
 def get_all_my_bookings(token_data):
     created_by = token_data['user_id']
-    q = text(f"SELECT items.*, bookings.return_by, users.postcode FROM items, bookings, users WHERE bookings.created_by = {created_by} AND items.id = bookings.item_id AND items.owner_id = users.id;")
+    q = text(f"SELECT items.*, bookings.return_by, users.postcode FROM items, bookings, users WHERE bookings.created_by = {created_by} AND items.id = bookings.item_id AND items.owner_id = users.id AND bookings.confirmed = TRUE;")
     response = db.session.execute(q).fetchall() if db.session.execute(q).fetchall() else []
     def create_borrowed_item(response):
         return{'id': response.id,
@@ -185,7 +185,7 @@ def get_all_my_bookings(token_data):
 
 class ApiBooking(Resource):
     @token_required
-    def get(token_data, self, b_id):
+    def get(self, b_id, token_data):
         if b_id == 'requests':
             confirmed = False
         else:
@@ -212,7 +212,7 @@ class ApiBooking(Resource):
 
 
     @token_required
-    def post(token_data, self, b_id):
+    def post(self, b_id, token_data):
         item_id=request.form.get('item_id')
         owner_id=Item.query.with_entities(Item.owner_id).filter_by(id=item_id).first()[0]
         created_by=token_data['user_id']
@@ -229,15 +229,15 @@ class ApiBooking(Resource):
         return jsonify(f'{booking.return_by.strftime("%d/%m/%Y")}')
 
     @token_required
-    def patch(token_data, self, b_id):
+    def patch(self, b_id, token_data):
         booking = Booking.query.filter_by(item_id=b_id).first()
         booking.confirmed = True
         db.session.commit()
         return jsonify(f'Booking {booking.id} confirmed successfully')
 
     @token_required
-    def delete(token_data, self, b_id):
-        booking = Booking.query.filter_by(id=b_id).first()
+    def delete(self, b_id, token_data):
+        booking = Booking.query.filter_by(item_id=b_id).first()
         db.session.delete(booking)
         db.session.commit()
         return jsonify(f'Booking deleted')
