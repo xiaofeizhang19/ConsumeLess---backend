@@ -164,7 +164,7 @@ class ApiUser(Resource):
 @token_required
 def get_all_my_bookings(token_data):
     created_by = token_data['user_id']
-    q = text(f"SELECT items.*, bookings.return_by, users.postcode FROM items, bookings, users WHERE bookings.created_by = {created_by} AND items.id = bookings.item_id AND items.owner_id = users.id;")
+    q = text(f"SELECT items.*, bookings.return_by, users.postcode FROM items, bookings, users WHERE bookings.created_by = {created_by} AND items.id = bookings.item_id AND items.owner_id = users.id AND bookings.confirmed = TRUE;")
     response = db.session.execute(q).fetchall() if db.session.execute(q).fetchall() else []
     def create_borrowed_item(response):
         return{'id': response.id,
@@ -237,7 +237,7 @@ class ApiBooking(Resource):
 
     @token_required
     def delete(self, b_id, token_data):
-        booking = Booking.query.filter_by(id=b_id).first()
+        booking = Booking.query.filter_by(item_id=b_id).first()
         db.session.delete(booking)
         db.session.commit()
         return jsonify(f'Booking deleted')
