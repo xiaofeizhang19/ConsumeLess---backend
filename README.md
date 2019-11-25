@@ -1,5 +1,10 @@
-# Consume£€$$ Backend
+# ConsumeLess Backend
 [![CircleCI](https://circleci.com/gh/xiaofeizhang19/ConsumeLess-backend.svg?style=svg)](https://circleci.com/gh/xiaofeizhang19/ConsumeLess-backend)
+
+## Introduction
+This application serves as the backend for our final project at Makers Academy. For details of project refer to [ConsumeLess -Frontend](https://github.com/xiaofeizhang19/ConsumeLess-frontend/edit/master/README.md).
+
+The backend has been built in Python and Flask, providing REST APIs for data trasmition. It has been built with CircleCI and deployed on heroku.
 
 ## Requirements
 > This application runs using python and postgresql as a database.  
@@ -28,5 +33,3 @@
 ## Testing
 -to run tests with coverage output run  
 ``` $ dotenv run pytest -v --cov=consumeless ```
-
-```Ollie was here```
