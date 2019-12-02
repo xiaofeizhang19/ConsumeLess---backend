@@ -1,5 +1,6 @@
-# ConsumeLess Backend
 [![CircleCI](https://circleci.com/gh/xiaofeizhang19/ConsumeLess-backend.svg?style=svg)](https://circleci.com/gh/xiaofeizhang19/ConsumeLess-backend)
+
+# ConsumeLess Backend
 
 ## Introduction
 This application serves as the backend for our final project at Makers Academy. For details of project refer to [ConsumeLess -Frontend](https://github.com/xiaofeizhang19/ConsumeLess-frontend/edit/master/README.md).
