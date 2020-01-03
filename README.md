@@ -3,7 +3,7 @@
 # ConsumeLess Backend
 
 ## Introduction
-This application serves as the backend for our final project at Makers Academy. For details of project refer to [ConsumeLess -Frontend](https://github.com/xiaofeizhang19/ConsumeLess-frontend/edit/master/README.md).
+This application serves as the backend for our final project at Makers Academy. For details of the project refer to [ConsumeLess -Frontend](https://github.com/xiaofeizhang19/ConsumeLess-frontend/edit/master/README.md).
 
 The backend has been built in Python and Flask, providing REST APIs for data trasmition. It has been built with CircleCI and deployed on heroku.
 
